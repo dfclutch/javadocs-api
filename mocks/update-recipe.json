@@ -1,0 +1,6 @@
+{
+  "body": "{\"recipe\":\"updated recipe\"}",
+  "pathParameters": {
+    "id": "b9da0050-d431-11eb-abf0-5b50d1e8cfe1"
+  }
+}

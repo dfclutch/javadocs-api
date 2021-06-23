@@ -11,8 +11,8 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs10.x
-  stage: dev
+  runtime: nodejs12.x
+  stage: prod
   region: us-east-1
   # To load environment variables externally
   # rename env.example to .env and uncomment
@@ -20,12 +20,48 @@ provider:
   # commit your .env.
   #
   environment:
-    APP_NAME: ${env:APP_NAME}
+    recipeTable: recipes
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeTable
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
 functions:
-  hello:
-    handler: handler.hello
+  create:
+    handler: recipe.create
     events:
       - http:
-          path: hello
+          path: recipes
+          method: post
+  get:
+    handler: recipe.get
+    events:
+      - http:
+          path: recipes/{id}
           method: get
+  list:
+    handler: recipe.list
+    events:
+      - http:
+          path: recipes
+          method: get
+  update:
+    handler: recipe.update
+    events:
+      - http:
+          path: recipes/{id}
+          method: put
+  delete:
+    handler: recipe.deleteRecipe
+    events:
+      - http:
+          path: recipes/{id}
+          method: delete
