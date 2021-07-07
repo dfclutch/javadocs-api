@@ -1,8 +1,8 @@
 import * as uuid from "uuid";
-import handler from "./libs/handler";
-import dynamoDb from './libs/dynamo';
+import handler from "../libs/handler";
+import dynamoDb from '../libs/dynamo';
 
-export const create = handler(async (event, context) => {
+export const create = handler(async (event) => {
   const data = JSON.parse(event.body);
   const params = {
     TableName: process.env.recipeTable,
@@ -18,7 +18,7 @@ export const create = handler(async (event, context) => {
   return params.Item;
 });
 
-export const get = handler(async (event, context) => {
+export const get = handler(async (event) => {
   const params = {
     TableName: process.env.recipeTable,
     Key: {
@@ -35,7 +35,8 @@ export const get = handler(async (event, context) => {
   return result.Item;
 });
 
-export const list = handler(async (event, context) => {
+export const list = handler(async (event) => {
+  console.log(event);
   const params = {
     TableName: process.env.recipeTable,
     KeyConditionExpression: "userId = :userId",
@@ -48,7 +49,7 @@ export const list = handler(async (event, context) => {
   return result.Items;
 });
 
-export const update = handler(async (event, context) => {
+export const update = handler(async (event) => {
   const data = JSON.parse(event.body);
   const params = {
     TableName: process.env.recipeTable,
@@ -68,7 +69,7 @@ export const update = handler(async (event, context) => {
   return { status: true };
 });
 
-export const deleteRecipe = handler(async (event, context) => {
+export const deleteRecipe = handler(async (event) => {
   const params = {
     TableName: process.env.recipeTable,
     Key: {

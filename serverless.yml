@@ -21,6 +21,8 @@ provider:
   #
   environment:
     recipeTable: recipes
+    usersTable: usersTable
+    jwtSecret: ${env:JWT_SECRET}
 
   iamRoleStatements:
     - Effect: Allow
@@ -34,34 +36,65 @@ provider:
         - dynamodb:DescribeTable
       Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
+resources:
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: usersTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
 functions:
-  create:
-    handler: recipe.create
+  # user functions
+  registerUser:
+    handler: handlers/users.register
     events:
       - http:
-          path: recipes
+          path: users/register
           method: post
-  get:
-    handler: recipe.get
+  listUsers:
+    handler: handlers/users.list
+    events:
+      - http:
+        path: users/list
+        method: get
+  # recipe functions
+  createRecipe: 
+    handler: handlers/recipe.create
+    events:
+      - http:
+          path: recipes/create
+          method: post
+  getRecipe:
+    handler: handlers/recipe.get
     events:
       - http:
           path: recipes/{id}
           method: get
-  list:
-    handler: recipe.list
-    events:
-      - http:
-          path: recipes
-          method: get
-  update:
-    handler: recipe.update
+  updateRecipe:
+    handler: handlers/recipe.update
     events:
       - http:
           path: recipes/{id}
-          method: put
-  delete:
-    handler: recipe.deleteRecipe
+          method: post
+  listRecipes:
+    handler: handlers/recipe.list
     events:
       - http:
-          path: recipes/{id}
+          path: recipes/
+          method: post
+  deleteRecipe:
+    handler: handlers/recipe.deleteRecipe
+    events:
+      - http:
+          path: recipes/delete/{id}
           method: delete
+  

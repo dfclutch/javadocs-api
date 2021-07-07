@@ -1,18 +1,27 @@
+import { get } from "lodash";
+
 export default function handler(lambda) {
-  return async function (event, context) {
-    let body, statusCode;
-
+  return async function (event) {
     try {
-      body = await lambda(event, context);
-      statusCode = 200;
-    } catch (e) {
-      body = { error: e.message };
-      statusCode = 500;
-    }
+      const result = await lambda(event);
 
-    return {
-      statusCode,
-      body: JSON.stringify(body),
-    };
+      if (get(result, 'error')) {
+        return {
+          statusCode: 500,
+          error: result.error
+        };
+      }
+
+      return {
+        statusCode: 200,
+        body: result
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 500,
+        error
+      };
+    }
   };
 }
